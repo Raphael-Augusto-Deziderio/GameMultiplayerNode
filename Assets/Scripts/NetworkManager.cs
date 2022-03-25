@@ -9,6 +9,7 @@ public class NetworkManager : MonoBehaviour
     public static NetworkManager instance;
     public SocketIOComponent socket;
     public Text txt;
+    public Dictionary<string, Player> networkPlayers = new Dictionary<string, Player>();
     // Start is called before the first frame update
     void Start()
     {
@@ -16,8 +17,9 @@ public class NetworkManager : MonoBehaviour
         {
             instance = this;
             socket = GetComponent<SocketIOComponent>();
-            //socket.On("PONG", OnReceivePong);
-            socket.On("SPAWN", OnReceiveSpawn);
+            socket.On("JOIN_SUCCESS", OnJoinSuccess);
+            socket.On("SPAWN_PLAYER", OnSpawnPlayer);
+        
         } else
         {
             Destroy(this.gameObject);
@@ -29,43 +31,31 @@ public class NetworkManager : MonoBehaviour
     {
         if (Input.GetKeyUp("r"))
         {
-            SendSpawnPerson();
-         
+            EmitJoin();
         }
     }
 
-    //Enviar ping ao servidor
-    public void SendPingToServer()
+    public void OnSpawnPlayer(SocketIOEvent pack)
     {
-        Dictionary<string, string> pack = new Dictionary<string, string>();
-        pack["message"] = "ping!!";
-        Debug.Log("Mensagem enviada ao servidor: " + pack["message"]);
-        socket.Emit("PING", new JSONObject(pack));
-    }
-
-    public void OnReceivePong(SocketIOEvent pack)
-    {
-        Debug.Log("CHEGUEI NO UNITY DE VOLTA");
-
         Dictionary<string, string> result = pack.data.ToDictionary();
-        Debug.Log("Mensagem do servidor: " + result["message"]);
+        Player dataPlayer = Instantiate(personPrefab, new Vector3(0, 0, 0), Quaternion.identity).GetComponent<Player>();
+        dataPlayer.gameObject.name = result["id"];
+        dataPlayer.name = result["id"];
+        dataPlayer.gameObject.GetComponentInChildren<TextMesh>().text = result["name"];
+        networkPlayers[result["id"]] = dataPlayer;
     }
 
-    public void SendSpawnPerson()
+    public void EmitJoin()
     {
-        GameObject spawn = Instantiate(personPrefab, transform.position, transform.rotation) as GameObject;
-        spawn.SetActive(true);
-        Dictionary<string, string> pack = new Dictionary<string, string>();
-        pack["message"] = transform.position.ToString();
-        socket.Emit("SPAWN", new JSONObject(pack));
+        Debug.Log("EmitJoin");
+        Dictionary<string, string> data = new Dictionary<string, string>();
+        data["name"] = Random.Range(1, 10).ToString();
+        socket.Emit("JOIN_ROOM", new JSONObject(data));
+        socket.Emit("TESTE", new JSONObject(data));
     }
-
-    public void OnReceiveSpawn(SocketIOEvent pack)
+    public void OnJoinSuccess(SocketIOEvent pack)
     {
-        Debug.Log("CHEGUEI");
-        Dictionary<string, string> result = pack.data.ToDictionary();
-        string result2 = "RECEBI DO SERVER: "+result;
-        txt.text = result2;
+        Debug.Log("OnJoinSuccess");
+        OnSpawnPlayer(pack);
     }
-
 }
