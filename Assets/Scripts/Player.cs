@@ -4,38 +4,56 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    float velocity;
 
+    float speedPos = 10f;
+    float speedRot = 500f;
+    public bool isLocalPlayer;
 
     // Start is called before the first frame update
     void Start()
     {
-        velocity = 10;
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKey("w"))
+       
+        if (isLocalPlayer)
         {
-            transform.Translate(0, 0, (velocity*Time.deltaTime));
-        }
+            var hor = Input.GetAxis("Horizontal") * Time.deltaTime * speedRot;
+            var vert = Input.GetAxis("Vertical") * Time.deltaTime * speedPos;
 
-        if (Input.GetKey("s"))
-        {
-            transform.Translate(0, 0, (-velocity * Time.deltaTime));
-        }
+            transform.Rotate(0, hor, 0);
+            transform.Translate(vert, 0, 0);
 
-        if (Input.GetKey("a"))
-        {
-            transform.Translate((-velocity * Time.deltaTime), 0, 0);
+            if(hor != 0 || vert != 0)
+            {
+                UpdateStatustoServer();
+            }
         }
-
-        if (Input.GetKey("d"))
-        {
-            transform.Translate((velocity * Time.deltaTime),0 , 0);
-        }
-
     }
 
+    public void UpdateStatustoServer()
+    {
+        NetworkManager.instance.EmitPosAndRot(transform.position, transform.rotation);
+    }
+
+    public void UpdatePosAndRot(Vector3 pos, Quaternion rot)
+    {
+        transform.position = pos;
+        transform.rotation = rot;
+    }
+
+    public void OnCollisionEnter(Collision collision)
+    {
+        Rigidbody other = collision.gameObject.GetComponent<Rigidbody>();
+
+        if (other.name != this.gameObject.name || other.name != "ground")
+        {
+            other.AddForce(transform.right * 500);
+        }         
+    }
 }
+
+

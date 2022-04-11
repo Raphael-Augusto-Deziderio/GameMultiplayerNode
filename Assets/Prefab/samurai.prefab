@@ -94,7 +94,7 @@ TextMesh:
   m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
   m_Color:
     serializedVersion: 2
-    rgba: 4294967295
+    rgba: 4278190080
 --- !u!1001 &6915934869980224504
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -204,3 +204,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 415ed44288a6465439a7c9a476165df0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  speed: 1000
+  isLocalPlayer: 0
