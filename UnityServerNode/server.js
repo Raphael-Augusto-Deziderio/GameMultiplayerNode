@@ -1,22 +1,52 @@
+const { count } = require("console");
+const { Socket } = require("dgram");
 var express = require("express");
 var app = express();
 var http = require("http").Server(app);
 var io = require("socket.io")(http);
 
-io.on("connection", function (socket) {
-  socket.on("PING", function (pack) {
-    console.log("Mensagem recebida do unity: " + pack.message);
+var clientLookup = {};
 
-    var json_pack = {
-      message: "pong!!!",
+io.on("connection", function (socket) {
+  var currentPlayer;
+
+  socket.on("JOIN_ROOM", function (pack) {
+    currentPlayer = {
+      name: pack.name,
+      id: socket.id,
+      position: "0d0,0d0,0d0",
+      rotation: "0d0,0d0,0d0",
     };
 
-    socket.emit("PONG", json_pack);
+    clientLookup[currentPlayer.id] = currentPlayer;
+
+    socket.emit("JOIN_SUCCESS", currentPlayer);
+
+    //envia o jogador atual para TODOS  os jogadores online
+    socket.broadcast.emit("SPAWN_PLAYER", currentPlayer);
+
+    //agora enviar TODOS os jogadores para o jogador atual
+    for (client in clientLookup) {
+      if (clientLookup[client].id != currentPlayer.id) {
+        socket.emit("SPAWN_PLAYER", clientLookup[client]);
+      }
+    }
   });
 
-  socket.on("SPAWN", function (pack) {
-    socket.emit("SPAWN", pack.message);
-    console.log("RECEBI DO CLIENT: " + pack.message);
+  //ENVIA A POSIÇÃO DO PLAYER PARA TODOS OS PLAYERS ONLINE
+  socket.on("MOVE_AND_ROT", function (pack) {
+    var data = {
+      id: currentPlayer.id,
+      position: pack.position,
+      rotation: pack.rotation,
+    };
+
+    currentPlayer.position = data.position;
+    currentPlayer.rotation = data.rotation;
+    data.position = currentPlayer.position;
+    data.rotation = currentPlayer.rotation;
+
+    socket.broadcast.emit("UPDATE_POS_ROT", data);
   });
 });
 

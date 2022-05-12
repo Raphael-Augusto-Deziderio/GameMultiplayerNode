@@ -16,7 +16,7 @@ public class NetworkManager : MonoBehaviour
     public Transform CanvasParent;
     public GameObject CanvasGO;
     public Dictionary<string, Player> networkPlayers = new Dictionary<string, Player>();
-    Player dataPlayer;
+  
     // Start is called before the first frame update
     void Start()
     {
@@ -39,128 +39,40 @@ public class NetworkManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-       
+
     }
 
     public void OnJoinSuccess(SocketIOEvent pack)
     {
-
         Dictionary<string, string> result = pack.data.ToDictionary();
-        int order = int.Parse(result["order"]);
-        dataPlayer = Instantiate(personPrefab, new Vector3(-3, 2, 5), Quaternion.Euler(0, -90, 0)).GetComponent<Player>();
+        Player dataPlayer = Instantiate(personPrefab, new Vector3(0, 0, 0), Quaternion.Euler(0, -90, 0)).GetComponent<Player>();
+        dataPlayer.isLocalPlayer = true;
         // dataPlayer.transform.SetParent(CanvasParent);
         dataPlayer.gameObject.name = result["id"];
         dataPlayer.name = result["id"];
         dataPlayer.gameObject.GetComponentInChildren<TextMesh>().text = result["name"];
-        dataPlayer.isLocalPlayer = true;
         networkPlayers[result["id"]] = dataPlayer;
-        Debug.Log(order);
-
-
-
-        /*switch (order)
-          {
-              case 1:
-                  dataPlayer = Instantiate(personPrefab, new Vector3(-3, 2, 5), Quaternion.Euler(0, -90, 0)).GetComponent<Player>();
-                  // dataPlayer.transform.SetParent(CanvasParent);
-                  dataPlayer.gameObject.name = result["id"];
-                  dataPlayer.name = result["id"];
-                  dataPlayer.gameObject.GetComponentInChildren<TextMesh>().text = result["name"];
-                  dataPlayer.isLocalPlayer = true;
-                  networkPlayers[result["id"]] = dataPlayer;
-                  Debug.Log(order);
-                  break;
-              case 2:
-                  dataPlayer = Instantiate(personPrefab, new Vector3(3, 2, 5), Quaternion.Euler(0, -90, 0)).GetComponent<Player>();
-                  // dataPlayer.transform.SetParent(CanvasParent);
-                  dataPlayer.gameObject.name = result["id"];
-                  dataPlayer.name = result["id"];
-                  dataPlayer.gameObject.GetComponentInChildren<TextMesh>().text = result["name"];
-                  dataPlayer.isLocalPlayer = true;
-                  networkPlayers[result["id"]] = dataPlayer;
-                  Debug.Log(order);
-                  break;
-              case 3:
-                  dataPlayer = Instantiate(personPrefab, new Vector3(3, 2, 12), Quaternion.Euler(0, -90, 0)).GetComponent<Player>();
-                  // dataPlayer.transform.SetParent(CanvasParent);
-                  dataPlayer.gameObject.name = result["id"];
-                  dataPlayer.name = result["id"];
-                  dataPlayer.gameObject.GetComponentInChildren<TextMesh>().text = result["name"];
-                  dataPlayer.isLocalPlayer = true;
-                  networkPlayers[result["id"]] = dataPlayer;
-                  Debug.Log(order);
-                  break;
-              case 4:
-                  dataPlayer = Instantiate(personPrefab, new Vector3(-3, 2, -12), Quaternion.Euler(0, -90, 0)).GetComponent<Player>();
-                  // dataPlayer.transform.SetParent(CanvasParent);
-                  dataPlayer.gameObject.name = result["id"];
-                  dataPlayer.name = result["id"];
-                  dataPlayer.gameObject.GetComponentInChildren<TextMesh>().text = result["name"];
-                  dataPlayer.isLocalPlayer = true;
-                  networkPlayers[result["id"]] = dataPlayer;
-                  Debug.Log(order);
-                  break;
-              default:
-                  break;
-          }*/
+        Debug.Log("JOIN");
     }
 
     public void OnSpawnPlayer(SocketIOEvent pack)
     {
-
         Dictionary<string, string> result = pack.data.ToDictionary();
-
-        int order = int.Parse(result["order"]);
-
-        switch (order)
-            {
-                case 1:
-                    dataPlayer = Instantiate(personPrefab, new Vector3(-3, 2, 5), Quaternion.Euler(0, -90, 0)).GetComponent<Player>();
-                    // dataPlayer.transform.SetParent(CanvasParent);
-                    dataPlayer.gameObject.name = result["id"];
-                    dataPlayer.name = result["id"];
-                    dataPlayer.gameObject.GetComponentInChildren<TextMesh>().text = result["name"];
-                    dataPlayer.isLocalPlayer = false;
-                    networkPlayers[result["id"]] = dataPlayer;
-                Debug.Log(order);
-                break;
-                case 2:
-                    dataPlayer = Instantiate(personPrefab, new Vector3(3, 2, 5), Quaternion.Euler(0, -90, 0)).GetComponent<Player>();
-                    // dataPlayer.transform.SetParent(CanvasParent);
-                    dataPlayer.gameObject.name = result["id"];
-                    dataPlayer.name = result["id"];
-                    dataPlayer.gameObject.GetComponentInChildren<TextMesh>().text = result["name"];
-                    dataPlayer.isLocalPlayer = false;
-                    networkPlayers[result["id"]] = dataPlayer;
-                Debug.Log(order);
-                break;
-                case 3:
-                    dataPlayer = Instantiate(personPrefab, new Vector3(3, 2, 12), Quaternion.Euler(0, -90, 0)).GetComponent<Player>();
-                    // dataPlayer.transform.SetParent(CanvasParent);
-                    dataPlayer.gameObject.name = result["id"];
-                    dataPlayer.name = result["id"];
-                    dataPlayer.gameObject.GetComponentInChildren<TextMesh>().text = result["name"];
-                    dataPlayer.isLocalPlayer = false;
-                    networkPlayers[result["id"]] = dataPlayer;
-                Debug.Log(order);
-                break;
-                case 4:
-                    dataPlayer = Instantiate(personPrefab, new Vector3(-3, 2, -12), Quaternion.Euler(0, -90, 0)).GetComponent<Player>();
-                    // dataPlayer.transform.SetParent(CanvasParent);
-                    dataPlayer.gameObject.name = result["id"];
-                    dataPlayer.name = result["id"];
-                    dataPlayer.gameObject.GetComponentInChildren<TextMesh>().text = result["name"];
-                    dataPlayer.isLocalPlayer = false;
-                    networkPlayers[result["id"]] = dataPlayer;
-                Debug.Log(order);
-                break;
-
-                default:
-
-                break;
-            }
+        Vector3 pos = JsonToVector3(result["position"]);
+        Quaternion rot = JsonToQuaternion(result["rotation"]);
+        Debug.Log("pos: " + pos);
+        Debug.Log("rot: " + rot);
+        //Player dataPlayer = Instantiate(personPrefab, pos, Quaternion.Euler(0, -90, 0)).GetComponent<Player>();
+        Player dataPlayer = Instantiate(personPrefab, pos, rot).GetComponent<Player>();
+        dataPlayer.isLocalPlayer = false;
+        // dataPlayer.transform.SetParent(CanvasParent);
+        dataPlayer.gameObject.name = result["id"];
+        dataPlayer.name = result["id"];
+        dataPlayer.gameObject.GetComponentInChildren<TextMesh>().text = result["name"];
+        networkPlayers[result["id"]] = dataPlayer;
+        Debug.Log("SPAWN");
     }
-
+     
 
     public void EmitJoin()
     {
@@ -169,9 +81,8 @@ public class NetworkManager : MonoBehaviour
         socket.Emit("JOIN_ROOM", new JSONObject(data));
         login.SetActive(false);
         window.SetActive(true);
+        Debug.Log("EMIT JOIN");
     }
-
-   
 
     public void EmitPosAndRot(Vector3 newPos, Quaternion newRot)
     {
@@ -203,6 +114,14 @@ public class NetworkManager : MonoBehaviour
         Vector4 newVector;
         string[] newString = Regex.Split(target, "d");
         newVector = new Vector4(float.Parse(newString[0]), float.Parse(newString[1]), float.Parse(newString[2]), float.Parse(newString[3]));
+        return newVector;
+    }
+
+    Quaternion JsonToQuaternion(string target)
+    {
+        Quaternion newVector;
+        string[] newString = Regex.Split(target, "d");
+        newVector = new Quaternion(float.Parse(newString[0]), float.Parse(newString[1]), float.Parse(newString[2]), float.Parse(newString[3]));
         return newVector;
     }
 

@@ -22,8 +22,8 @@ public class GameManager : MonoBehaviour
         Debug.Log(dataWinner);
     }
 
-    public void Lose()
+    public void Lose(Dictionary<string, string> dataLoser)
     {
-
+        Debug.Log(dataLoser);
     }
 }
