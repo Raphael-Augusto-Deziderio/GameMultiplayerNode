@@ -45,7 +45,7 @@ public class NetworkManager : MonoBehaviour
     public void OnJoinSuccess(SocketIOEvent pack)
     {
         Dictionary<string, string> result = pack.data.ToDictionary();
-        Player dataPlayer = Instantiate(personPrefab, new Vector3(0, 0, 0), Quaternion.Euler(0, -90, 0)).GetComponent<Player>();
+        Player dataPlayer = Instantiate(personPrefab, new Vector3(0, 2, 0), Quaternion.Euler(0, -90, 0)).GetComponent<Player>();
         dataPlayer.isLocalPlayer = true;
         // dataPlayer.transform.SetParent(CanvasParent);
         dataPlayer.gameObject.name = result["id"];

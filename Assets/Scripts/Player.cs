@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
@@ -53,6 +54,14 @@ public class Player : MonoBehaviour
         {
             other.AddForce(transform.right * 500);
         }         
+    }
+
+    public void Lose()
+    {
+        if (isLocalPlayer)
+        {
+            SceneManager.LoadScene("Lose");
+        }
     }
 }
 

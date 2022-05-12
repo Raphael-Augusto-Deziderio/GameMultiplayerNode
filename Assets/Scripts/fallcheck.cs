@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class fallcheck : MonoBehaviour
 {
@@ -19,6 +20,7 @@ public class fallcheck : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         Player player = other.GetComponent<Player>();
+        player.Lose();
         Destroy(other.gameObject);
     }
 }

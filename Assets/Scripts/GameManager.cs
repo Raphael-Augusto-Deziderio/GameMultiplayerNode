@@ -17,13 +17,9 @@ public class GameManager : MonoBehaviour
         
     }
 
-    public void Winner(Dictionary<string, string> dataWinner)
-    {
-        Debug.Log(dataWinner);
-    }
 
-    public void Lose(Dictionary<string, string> dataLoser)
+    public void Exit()
     {
-        Debug.Log(dataLoser);
+        Application.Quit();
     }
 }

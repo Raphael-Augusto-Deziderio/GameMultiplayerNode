@@ -14,11 +14,12 @@ io.on("connection", function (socket) {
     currentPlayer = {
       name: pack.name,
       id: socket.id,
-      position: "0d0,0d0,0d0",
+      position: "0d0,10d0,0d0",
       rotation: "0d0,0d0,0d0",
     };
 
     clientLookup[currentPlayer.id] = currentPlayer;
+    console.log(Object.values(clientLookup));
 
     socket.emit("JOIN_SUCCESS", currentPlayer);
 
